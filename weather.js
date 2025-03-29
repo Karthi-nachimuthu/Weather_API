@@ -1,28 +1,28 @@
-function fetchWeather(latitude, longitude) {
-    const url = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true`;
-
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            const weather = data.current_weather;
-            document.getElementById("location").innerText = `Location: Latitude ${latitude}, Longitude ${longitude}`;
-            document.getElementById("temperature").innerText = `Temperature: ${weather.temperature}°C`;
-            document.getElementById("weather-condition").innerText = `Condition: ${weather.weathercode}`;
-        })
-        .catch(error => console.error("Error fetching weather:", error));
-}
-
-// Get user's geolocation
-navigator.geolocation.getCurrentPosition(
-    (position) => {
-        const latitude = position.coords.latitude;
-        const longitude = position.coords.longitude;
-        fetchWeather(latitude, longitude);
-    },
-    (error) => {
-        console.error("Geolocation error:", error);
-        document.getElementById("location").innerText = "Could not fetch location.";
-        // Default location (e.g., New York)
-        fetchWeather(40.7128, -74.0060);
+const apiKey = '2e5437c4b5f53c0daaf088427516d505'; // Replace with your API key
+async function fetchWeather() {
+    const city = document.getElementById('city').value;
+    if (!city) {
+        alert('Please enter a city name');
+        return;
     }
-);
+    const apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        displayWeather(data);
+    } catch (error) {
+        console.error('Error fetching weather data:', error);
+    }
+}
+function displayWeather(data) {
+    const weatherContainer = document.getElementById('weather');
+    if (data.cod !== 200) {
+        weatherContainer.innerHTML = `<p>${data.message}</p>`;
+        return;
+    }
+    weatherContainer.innerHTML = `
+        <h2>Weather in ${data.name}</h2>
+        <p>Temperature: ${data.main.temp}°C</p>
+        <p>Weather: ${data.weather[0].description}</p>
+    `;
+}
