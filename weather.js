@@ -25,3 +25,17 @@ async function fetchWeather() {
         console.error("Error fetching weather data:", error);
     }
 }
+function displayWeather(data) {
+    const weatherContainer = document.getElementById("weather");
+
+    if (data.cod !== 200) {
+        weatherContainer.innerHTML = `<p>${data.message}</p>`;
+        return;
+    }
+
+    weatherContainer.innerHTML = `
+        <h2>Weather in ${data.name}</h2>
+        <p>Temperature: ${data.main.temp}°C</p>
+        <p>Weather: ${data.weather[0].description}</p>
+    `;
+}
